@@ -1,0 +1,444 @@
+SQL Shell
+
+
+DB PostgresSQL
+port 5432
+pass 43214321
+
+
+Docs:
+https://postgrespro.ru/docs/postgrespro/14/sql-select
+https://oracleplsql.ru/postgresql-manual.html  !!!
+
+Sintax
+SELECT список_столбцов FROM имя_таблицы;
+SELECT список_столбцов - это то, какой столбец будет выведен в консоль.
+FROM имя_таблицы - это то, из какой таблицы будем это извлекать.
+
+SELECT [ ALL | DISTINCT [ ON ( выражение [, ...] ) ] ]
+    [ * | выражение [ [ AS ] имя_результата ] [, ...] ]
+    [ FROM элемент_FROM [, ...] ]
+    [ WHERE условие ]
+    [ GROUP BY [ ALL | DISTINCT ] элемент_группирования [, ...] ]
+    [ HAVING условие ]
+    [ WINDOW имя_окна AS ( определение_окна ) [, ...] ]
+    [ { UNION | INTERSECT | EXCEPT } [ ALL | DISTINCT ] выборка ]
+    [ ORDER BY выражение [ ASC | DESC | USING оператор ] [ NULLS { FIRST | LAST } ] [, ...] ]
+    [ LIMIT { число | ALL } ]
+    [ OFFSET начало [ ROW | ROWS ] ]
+    [ FETCH { FIRST | NEXT } [ число ] { ROW | ROWS } { ONLY | WITH TIES } ]
+    [ FOR { UPDATE | NO KEY UPDATE | SHARE | KEY SHARE } [ OF имя_таблицы [, ...] ] [ NOWAIT | SKIP LOCKED ] [...] ]
+
+создание таблицы
+CREATE TABLE table_name (
+	Column name + data type + constrains (if any)
+)
+
+WHERE - условие.
+ORDER BY - сортировка.
+GROUP BY - оператор используется в операторе SELECT для сбора данных по нескольким записям и группировки результатов по одному или нескольким столбцам.
+HAVING (имеет)
+AS - ALIASES временные имена для столбцов или таблиц.
+
+
+
+
+Команды:
+\l - вывести список БД
+CREATE DATABASE avecoder; - создать БД
+DROP DATABESE Test1;	  - удалить БД
+DROP TABLE employee;	  - удалить таблицу из БД
+\c avecoder - подключиться к БД
+\conninfo   - информация - "Вы подключены к базе данных "avecoder" как пользователь "postgres" (сервер "localhost": адрес "::1", порт "5432")."
+
+
+тестовое создание таблицы
+CREATE TABLE employee (
+	id BIGSERIAL,
+	first_name VARCHAR (50),
+	last_name VARCHAR (50),
+	gender VARCHAR (6),
+	email VARCHAR (150),
+	date_of_birth DATE
+);
+
+\d - просмотр списка таблиц.
+\d employee;  -  просмотр данные колонок таблицы (форматы, наллбл итд).
+SELECT FROM employee; - вывод кол-ва записей в таблице.
+
+нормальное создание и заполнение таблицы
+CREATE TABLE employee (
+	id BIGSERIAL NOT NULL PRIMARY KEY,
+	first_name VARCHAR (150) NOT NULL,
+	last_name VARCHAR (150) NOT NULL,
+	gender VARCHAR (16) NOT NULL,
+	email VARCHAR (200),
+	date_of_birth DATE NOT NULL,
+	country_of_birth VARCHAR(100) NOT NULL
+);
+INSERT INTO employee (first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES ('John', 'Doe', 'Male', 'jdddd@mail.com', '2020-01-01', 'Russia');
+INSERT INTO employee (first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES ('Dazz', 'Murt', 'Male', 'jaaad@mail.com', '2002-01-01', 'USA');
+INSERT INTO employee (first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES ('Den', 'Kigan', 'Male', 'jsssd@mail.com', '2012-01-01', 'Germany');
+INSERT INTO employee (first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES ('Anna', 'Rose', 'Female', 'anjd@mail.com', '2018-01-01', 'Holand');
+INSERT INTO employee (first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES ('Julia', 'Heloes', 'Female', 'july@mail.com', '2015-03-11', 'Turkish');
+
+\dt employee  -  отображение кол-ва таблиц в БД.
+генерация БД https://generatedata.com/generator, настройки в папке в виде скриншота.
+\i C:/PC/Work/Information/Other/DB/TABLEmployee_500_2.sql	- импорт БД.
+\! cls - очистить консоль.
+
+
+
+
+04 - SQL запросы выборка данных Часть 1 - https://www.youtube.com/watch?v=LeUDeVOYke8&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=5
+SELECT(выборка), ORDER BY(сортировка), DISTINCT(выдача без повторений), 
+WHERE("где" условие), AND, OR, LIMIT, OFFSET, FETCH	
+
+SELECT * FROM employee;		-  выборка всей таблицы employee
+SELECT FROM employee;		-  вывод числа записей в таблице employee
+
+q  -  выход из текущей команды
+
+SELECT first_name FROM employee;	 - выборка одной колонки из БД
+SELECT first_name, last_name FROM employee;	 - выборка двух колонок из БД
+SELECT * FROM employee ORDER BY country_of_birth ASC; - сортировки по возрастанию. (тут взяли все колонки БД и отсортировали по отдной колонке)
+SELECT * FROM employee ORDER BY country_of_birth DESC; - сортировка по убыванию
+SELECT * FROM employee ORDER BY email DESC;
+SELECT country_of_birth FROM employee ORDER BY country_of_birth;  -  (тут взяли одну столбец из БД и отсортировали по нему же, от А до Я (ASC можно не писать тк применяется по умолчанию))
+
+SELECT DISTINCT country_of_birth FROM employee ORDER BY country_of_birth; - вывели список стран без повторений с сотрировкой от А до Я по умолчанию.
+SELECT * FROM employee WHERE gender = 'Male';  -  решили узнать сколько людей женского пола работает в компании.
+SELECT * FROM employee WHERE gender = 'Female' AND country_of_birth='Austria'; -  решили узнать по нескольким условиям, сколько женщик, которые родились в аргентине
+SELECT * FROM employee WHERE gender = 'Male' AND (country_of_birth= 'Austria' OR country_of_birth = 'Belgium') ORDER BY country_of_birth; - выборка мужчин со страной рождения Австрия ИЛИ Бельгия и сортировка по стране рождения от А до Я.
+SELECT * FROM employee LIMIT 5; - вывели с ограничение в 5 строк из БД.
+SELECT * FROM employee OFFSET 10 LIMIT 5; - просмотр записей с 10 позиции и выводим 5 строк.
+SELECT * FROM employee OFFSET 10 FETCH FIRST 5 ROW ONLY; - аналог команды выше, только через FETCH(принести).
+
+
+
+
+05 - SQL запросы для выборки данных. Часть 2 - https://www.youtube.com/watch?v=LhKIg2Jip8c&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=6
+SELECT * FROM employee WHERE country_of_birth='Russian Federation' OR country_of_birth='Spain' OR country_of_birth='Ukraine';  - выборка из колонки country_of_birth несколько стран рождения без их дублирования с сорт. от А до Я.
+SELECT * FROM employee WHERE country_of_birth IN ('Russian Federation', 'Spain', 'Ukraine') ORDER BY country_of_birth ASC;  - сокращенная форма записи выше
+SELECT * FROM employee WHERE date_of_birth BETWEEN '2022-10-01' AND '2023-02-28' ORDER BY date_of_birth ASC;   - выборка с промежутками дат между '2022-10-01' AND '2023-02-28' с сорт. от А до Я.
+SELECT * FROM employee WHERE email LIKE '%@google.com';   - выборка из колонки email с окончанием значения на '.com'. Вместо знака % подставляются рандомные символы.
+SELECT * FROM employee WHERE country_of_birth LIKE 'S%';  - выборка всех работников у кого страна рождения начинается на букву "S". (регистр важен).
+SELECT * FROM employee WHERE country_of_birth iLIKE 's%';  - для игнорирования регистра вместо LIKE, пишем iLIKE. (теперь регистр НЕ важен).
+SELECT country_of_birth, COUNT(*) FROM employee GROUP BY country_of_birth;  - агрегатная функция COUNT, подсчет вывода результатов.
+SELECT first_name, COUNT(*) FROM employee GROUP BY first_name;  - агрегатная функция COUNT, подсчет вывода результатов.
+SELECT country_of_birth, COUNT(*) FROM employee GROUP BY country_of_birth HAVING COUNT(*) > 10;  - добавляем условие HAVING (имеет), тут выборка по странам где работает более 10 работников.
+SELECT country_of_birth, COUNT(*) FROM employee GROUP BY country_of_birth HAVING COUNT(*) > 10 ORDER BY country_of_birth DESC; - тут добавили сорт. от Я до А для колонки country_of_birth.
+SELECT id, first_name AS name, last_name AS surname, gender AS sex, email, date_of_birth, country_of_birth FROM employee;  - AS - ALIASES временные имена для столбцов или таблиц.
+
+COALESCE - возвращает первое не нулевое значение, которое присутствует в списке ее аргументов. И обычно эти аргументы представлены столбцом таблицы к которой обращен запрос.
+Н/П: у нас ни каждый работник имеет имэйл и чтобы не возвращать пустое поле, мы будем возвращать not applicable вместо пустого поля.
+SELECT COALESCE(email, 'not applicable') FROM employee; - тут где не было email, выводится not applicable, но у меня в БД везде есть email, поэтому not applicable не увидим.
+
+
+
+
+06 - Агрегаты и Базовая Арифметика - https://www.youtube.com/watch?v=2klWPw74kVc&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=7
+https://postgrespro.ru/docs/postgresql/9.5/functions-math
+
+SELECT MIN(price) FROM holiday;  - MAX(), MIN()- функция агрегатная. Вывод самой дорогой и дешевой путевок.
+SELECT AVG(price) FROM holiday;	 - AVG() - вывод среднего значения, но тут куча знаков после точки.
+SELECT ROUND(AVG(price)) FROM holiday;  - при помощи функции ROUND(AVG(price)), уменьшаем кол-во символов после запятой. Функцию AVG() подали как аргумент в функцию ROUND().
+
+SELECT destination_country, destination_city, MAX(price) FROM holiday GROUP BY destination_country, destination_city;  - выборка самых дорогих путевок по городам и странам
+SELECT destination_country, destination_city, MIN(price) FROM holiday GROUP BY destination_country, destination_city;  - аналог запросы выше только с MIN
+SELECT destination_country, MIN(price) FROM holiday GROUP BY destination_country;   -  выборки манимальной стоимости только по стране.
+SELECT SUM(price) FROM holiday;  - функция SUM(), суммирование.
+SELECT destination_country, SUM(price) FROM holiday GROUP BY destination_country;  - функция SUM(), сумма путевок в конкретную страну.
+арифметические расчеты примо в запросе:
+SELECT 100 + 2;
+SELECT 100 - 2;
+SELECT 100 * 2;
+SELECT 100 / 2;
+SELECT 100 ^ 2;  -  возмедение в степень.
+SELECT 100 % 2;  -  деление по модулю.
+SELECT factorial(5); -  factorial.
+
+функция округления ROUND
+SELECT id, destination_country, destination_city, price FROM holiday;  -  тут цена указана с копейками.
+SELECT id, destination_country, destination_city, ROUND(price) FROM holiday;  -  округляем, делаем без комеек.
+
+
+
+
+07 - Работа с Датой и Временем - https://www.youtube.com/watch?v=W6b-r9i1ZGg&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=8 
+SELECT NOW();  -  выдает время сейчас.
+SELECT NOW()::DATE; - вывод даты.
+SELECT NOW()::TIME; - вывод времени.
+SELECT NOW() - INTERVAL '100 YEAR'; - перемещаемся в прошлое на 100 лет назад.
+SELECT NOW() - INTERVAL '10 MONTHS'; - перемещаемся в прошлое на 100 месяцев назад.
+SELECT NOW() - INTERVAL '10 DAYS'; - перемещаемся в прошлое на 100 дней назад.
+SELECT NOW() + INTERVAL '100 YEAR';  - перемещаемся в будущее на 100 лет назад.
+
+Извлечение часть даты и общей выдачи - EXTRACT()
+SELECT EXTRACT(YEAR FROM NOW());
+SELECT EXTRACT(MONTH FROM NOW());
+SELECT EXTRACT(DAY FROM NOW());
+SELECT EXTRACT(DOW FROM NOW()); - вытаскиваем день недели (day of the week)
+
+функция AGE() - можем узнать возраст его либо от какого либо момента.
+SELECT first_name, last_name, gender, country_of_birth, date_of_birth FROM employee;  - тут просто выводится дата рождения
+SELECT first_name, last_name, gender, country_of_birth, AGE(NOW(), date_of_birth) AS age FROM employee;   -  а тут уже вывели в виде возраста чтобы не считать.
+
+
+
+
+08 - Первичные Ключи (Primary Keys) - https://www.youtube.com/watch?v=hZK3a8yhGzM&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=9 
+SELECT * FROM employee LIMIT 1; -  например мы хотим добавить в таблицу человека с одинаковыми данными и это нам не даст сделать id, тк это уникальный параметр/ограничитель.
+\d employee;   - тут мы наблюдаем как называется уникальный ограничитель "employee_pkey" PRIMARY KEY, btree (id).
+
+INSERT INTO employee (id, first_name,last_name,gender,email,date_of_birth,country_of_birth)
+VALUES('1', 'Aristotle','Hanson','Female','facilisi.sed@protonmail.ca','2021-12-10','Philippines');  -  пытаемся добавить такого же пользователя и нам выдает ошибку из-за ограничителя id, тк 
+
+ALTER TABLE employee DROP CONSTRAINT employee_pkey; - удаляем ограничитель, и теперь мы можем добавить пользователя с одинаковым id.
+\d employee;   - ограничитель "employee_pkey" PRIMARY KEY, btree (id), пропал.
+
+INSERT INTO employee (id, first_name,last_name,gender,email,date_of_birth,country_of_birth)
+VALUES('1', 'Aristotle','Hanson','Female','facilisi.sed@protonmail.ca','2021-12-10','Philippines'); - снова добавляем такого же участника и на этот раз он уже добавится.
+
+SELECT * FROM employee WHERE id = 1;  - проверяем что у нас добавился пользователь с одинаковым id.
+ALTER TABLE employee ADD PRIMARY KEY(id);  - мы возвращаем PRIMARY KEY для столбца id, но будет ошибка тк у нас в таблице теперь есть два одинаковых id.
+
+DELETE FROM employee WHERE id = 1;  - теперь нам нужно удалить один дубликат. при такой команде мы удалили обе записи.
+
+так не пойдет тк мы удалил две записи, нужную и не нужную.
+INSERT INTO employee (id, first_name,last_name,gender,email,date_of_birth,country_of_birth)
+VALUES('1', 'Aristotle','Hanson','Female','facilisi.sed@protonmail.ca','2021-12-10','Philippines');  - добавляем обратно нашего братишку.
+
+ALTER TABLE employee ADD PRIMARY KEY(id);  - возвращаем PRIMARY KEY для столбца id, на этот раз ошибки не будет, тк нет дублей.
+
+
+
+
+09 - Ограничения и проверки CONSTRAINT - https://www.youtube.com/watch?v=neeNEJu0cIc&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=10
+Ограничения - применяются к полям в таблице, чтобы данные в этих полях соответствовали опред. параметрами или условиям. Н/П: типам, уникальности или опред. паттернам.
+С помощью ключевого слова CONSTRAINT можно задать имя для ограничений. В качестве ограничений могут использоваться PRIMARY KEY, UNIQUE, CHECK.
+
+UNIQUE - уникализация столбца.
+SELECT email, COUNT(*) FROM employee GROUP BY email ORDER BY COUNT(*) DESC;  - проверяем есть ли дубликаты email. У нас дублей нет, но есть пустые поля.
+SELECT email, COUNT(*) FROM employee GROUP BY email HAVING COUNT(*) > 1;  - выборка с дубляжами имэйлов.
+
+INSERT INTO employee (first_name,last_name,gender,email,date_of_birth,country_of_birth)
+VALUES('Steel','Horne','Male','nascetur@outlook.com','2022-07-11','Pakistan');  - добавляем дублированного братишку.
+
+SELECT * FROM employee WHERE email='nascetur@outlook.com';  - выборка всех колонок у которых совпадает email. и видим два одинаковых чувака по ФИО и почте.
+ALTER TABLE employee ADD CONSTRAINT unique_email_adress UNIQUE (email);  - добавляем уникальное ограничение на столбец email.
+SELECT * FROM employee WHERE email='nascetur@outlook.com';  - находим людей с дублирующимися почтами.
+удаляем всех у кого почта дублируется:
+DELETE FROM employee WHERE id = 372;
+DELETE FROM employee WHERE id = 373;
+DELETE FROM employee WHERE id = 501;
+SELECT email, COUNT(*) FROM employee GROUP BY email ORDER BY COUNT(*) DESC;  -  убеждаемся что дубликатов у нас нет.
+ALTER TABLE employee ADD CONSTRAINT unique_email_adress UNIQUE (email);  - снова пробуем добавить уникальное ограничение на столбец email.
+
+CHECK - проверка опред. условий.
+SELECT * FROM employee; - например создадим ограничение, что пол может быть Male либо Female.
+для наглядности ручками изменили пол чуваку на Panda - ('Aristotle','Hanson','Panda','facilisi.sed@protonmail.ca','2021-12-10','Philippines'),
+
+INSERT INTO employee (first_name,last_name,gender,email,date_of_birth,country_of_birth)
+VALUES('Aristotle','Hanson','Panda','pandawanda@protonmail.ca','2021-12-10','Philippines');  - добавляем братишку.
+
+SELECT DISTINCT gender FROM employee;  - убеждаемся что у нас три пола в таблице.
+ALTER TABLE employee ADD CONSTRAINT gender_constraint CHECK (gender='Female' OR gender='Male');  -  добавляем ограничение которое будет осуществлять проверку, но тут будет ошибка, тк мы добавили пол Panda.
+DELETE FROM employee WHERE gender='Panda';  -  удаляем чувака с полом Panda.
+ALTER TABLE employee ADD CONSTRAINT gender_constraint CHECK (gender='Female' OR gender='Male');  - и пробуем снова поставить ограничение, теперь ограничение устанавливается корректно.
+
+INSERT INTO employee (first_name,last_name,gender,email,date_of_birth,country_of_birth)
+VALUES('Aristotle','Hanson','Panda','pandawanda@protonmail.ca','2021-12-10','Philippines');  - и теперь если попытаться добавить чувака с отличным полом от Male, Female мы будем получать ошибку.
+\d employee - проверяем характеристики таблицы и видим что у нас стоит ограничение Check constraints: "gender_constraint" CHECK (gender::text = 'Female'::text OR gender::text = 'Male'::text)
+
+
+
+
+
+10 - UPSERT и Работа с Конфликтами (ON CONFLICT DO) - https://www.youtube.com/watch?v=bd4fxUeQIN4&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=11 
+DELETE
+DELETE FROM employee;  - вся таблица опустеет.
+DELETE FROM employee WHERE id=4;  -  точечное удаление.
+SELECT * FROM employee WHERE email LIKE '%google%' AND country_of_birth = 'China';  - удаляем почты сотрудников из Китая кто использует почту google.
+DELETE FROM employee WHERE email LIKE '%google%' AND country_of_birth = 'China';  - и теперь удалим этих не надежных людей).
+
+UPDATE
+SELECT * FROM employee;
+UPDATE employee SET email = 'curry@mail.com';  - так мы можем всем сотрудникам изменить почты на curry@mail.com.
+UPDATE employee SET email = 'curry@mail.com' WHERE id=3;  - к нам пришел id=3 Rama и попросил поменять его имэйл.
+SELECT * FROM employee WHERE id=3;  -  убеждаемся что у него изменилась почта.
+UPDATE employee SET first_name='John', last_name='Dou', email='jdou@yandex.ru' WHERE id=3;
+SELECT * FROM employee WHERE id=3;  -  убеждаемся что у него изменилось ФИО и почта.
+
+В postgrasSQL у нас есть возможность регулировать то как postgrasSQL будет реагировать на различные конфликты.
+INSERT INTO employee (id, first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES (3, 'John', 'Dou', 'Male', 'jdou@yandex.ru', DATE '2022-03-28', 'New Zealand');   -  VARCHAR должны быть заключены в ковычки ''. При попытки добавления мы получим 
+ошибку, тк id=3 у нас уже есть. Но в postgrasSQL мы можем это ограничение обойти, добавив третью строчку.
+
+INSERT INTO employee (id, first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES (3, 'John', 'Dou', 'Male', 'jdou@yandex.ru', DATE '2022-03-28', 'New Zealand')
+ON CONFLICT (id) DO NOTHING;  -  жмем ентер и видим "INSERT 0 0", означает, что если конфликс из-за id то ни делай ничего. 
+
+\d employee  -  видим что в таблице у нас 3 ограничителя и если сработал первый то далее мы не пошли, ниже .....
+INSERT INTO employee (id, first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES (3, 'John', 'Dou', 'Male', 'jdou@yandex.ru', DATE '2022-03-28', 'New Zealand')
+ON CONFLICT (email) DO NOTHING;  - .... попробуем так же с email и наблюдаем что вставка произошла из-за конфликта id, тк они идут по очереди.
+
+INSERT INTO employee (id, first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES (3, 'John', 'Dou', 'Male', 'jdou@yandex.ru', DATE '2022-03-28', 'New Zealand')
+ON CONFLICT (first_name) DO NOTHING;  -  тут просто вставили колонку на которой нет ограничения и видим ошибку которая сработала из-за других ограничений.
+
+INSERT INTO employee (id, first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES (3, 'John', 'Dou', 'Male', 'jdou@google.ru', DATE '2022-03-28', 'New Zealand')
+ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;  - тут когда у нас был id не уникален, у нас не обновилось ничего кроме email.
+
+SELECT * FROM employee WHERE id=3;  -  проверяем что, почта изменилась.
+
+INSERT INTO employee (id, first_name, last_name, gender, email, date_of_birth, country_of_birth)
+VALUES (3, 'Janeee', 'Dou', 'Male', 'Janeee@google.ru', DATE '2022-03-28', 'New Zealand')
+ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email, first_name = EXCLUDED.first_name;  -  снова меняем имя и имэй несмотря на конфликт первичных ключей
+
+SELECT * FROM employee WHERE id=3;  -  проверяем что, почта изменилась.
+
+
+
+
+
+
+11 - Внешние ключи (Foreign Keys), Как выстраивать отношения между таблицами благодаря Foreign Keys - https://www.youtube.com/watch?v=SnBhRJVXkJw&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=12
+Предусловие - компания выделяет своим работникам велосипеды, НО нельзя ими делиться, у каждого работника свой велосипед.
+Работник может оформить себе только велосипед, но если не хочет, то может вообще себе ничего не оформлять.
+Создавать одну мега таблицу куда загонять и работников и велосипеды решение не лучшее. Нужно сделать 2 таблицы с работниками и велосипедами и сделать так чтобы работник 
+мог ссылаться на велосипед при надобности, для этого и существуют внешние ключи, которые по сути дела являются ссылкой от одной таблицы к первичному ключу в другой таблице.
+
+условие №1 - компания выделяет велосипеды.
+CREATE TABLE bicycle (
+	id BIGSERIAL NOT NULL PRIMARY KEY,
+	make VARCHAR(100) NOT NULL,
+	type VARCHAR(100) NOT NULL,
+	price NUMERIC(19, 2) NOT NULL
+);		 - создали таблицу
+
+теперь нужно обозначить внешний ключ в таблице employee
+\d employee  -  смотрим на таблицу до изменений
+ALTER TABLE employee ADD bicycle_id BIGINT REFERENCES bicycle (id); - тут добавляем строку с внешним ключем в таблицу employee. 
+																	  bicycle_id - это имя новой колонки, 
+																	  bicycle (id) - это внешнняя таблица и его колонка в параметрах откуда берем данные/ откуда ссылается.
+\d employee  -  смотрим на таблицу после изменений, Foreign-key constraints: "employee_bicycle_id_fkey" FOREIGN KEY (bicycle_id) REFERENCES bicycle(id).
+
+условие №2 - одному работнику, один велосипед, благодаря добавлению уникального ограничения
+ALTER TABLE employee ADD UNIQUE(bicycle_id); - тут указали какое поле мы хотим чтобы было уникальным.
+\d employee - видим что добавилась строка  Indexes:  "employee_bicycle_id_key" UNIQUE CONSTRAINT, btree (bicycle_id)
+
+заполним таблицу с велосипедами
+INSERT INTO bicycle (make, type, price) VALUES ('Indi ATB', 'Mountain Bike', '100.00');
+INSERT INTO bicycle (make, type, price) VALUES ('Apollo Cafe', 'Women Hybrid Bike', '160.00');
+INSERT INTO bicycle (make, type, price) VALUES ('Brompton', 'Folding Bike', '1045.00');
+
+SELECT * FROM bicycle;  -  убедились что велосибеды добавились.
+SELECT * FROM employee LIMIT(10);  - вывели таблицу с 10 работниками.
+UPDATE employee SET bicycle_id=2 WHERE id=5;  - привязываем id велосипеда Apollo к id Justine (employee id 5 = bicycle id 2). Тоесть тут обновляем таблицу employee, 
+где в колонку bicycle_id присваиваем id велосипеда=2 , и далее указываем id работника=5, тоесть к кому привязывает.
+SELECT * FROM employee WHERE id=5;   -  убеждаемся что bicycle_id прописалось.
+
+
+
+
+
+12 - Объединение таблиц (JOINS) - https://www.youtube.com/watch?v=3RN6bw9vrMI&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=13 
+
+INNER JOINS
+INNER JOINS - внутреннее объединение - это когда есть несколько таблиц у которых есть одинаковые колонки.
+12 - Объединение таблиц (JOINS) - INNER JOINS-1.png
+12 - Объединение таблиц (JOINS) - INNER JOINS-2.png
+12 - Объединение таблиц (JOINS) - INNER JOINS-3.png
+Н/П: после объединения таблиц pen+apple = мы получаем третью таблицу applepen у которой будут только совпадающие данные из таблиц apple и pen.
+
+SELECT * FROM bicycle; - просто смотрим таблицу и далее делаем внутренние объединение.
+
+SELECT * FROM employee
+JOIN bicycle ON employee.bicycle_id = bicycle.id;	- после ON пишем с какой таблице будет соединение и по какому полю и нам выводятся соединенные 2 таблицы. Тут вывелся 
+только один работник, тк мы выдале велосипед только одному.
+
+SELECT employee.first_name, bicycle.make, bicycle.type, bicycle.price
+FROM employee
+JOIN bicycle ON employee.bicycle_id = bicycle.id;  - мы можем выбирать только те поля по которым будет совершать объединение. FROM employee - это таблица основная, 
+после команды JOIN пишем к какому внешнему ключу привязываемся. И выводится таблица из 4 колонок.
+
+
+LEFT JOIN
+LEFT JOIN - выведет все записи из левой таблицы и только совпадения из правой таблицы. Тоесть все колонки из таблицы employee, и одна запись из таблицы bicycle.
+SELECT * FROM employee
+LEFT JOIN bicycle ON bicycle.id = employee.bicycle_id;  - тут основная таблица employee и просто слева цепляем LEFT JOIN bicycle и после ON к чему подвязываемся.
+
+после команды ON  писать так        employee.bicycle_id = bicycle.id;      или так     bicycle.id = employee.bicycle_id    разницы нет! По сути просто приравниваем 
+первичный и внешний ключ разных таблиц.
+
+но такой вывод не удобен из-за большого кол-ва колонок, и мы можем даже с LEFT JOIN вывести нужные колонки благодаря условиям
+SELECT * FROM employee
+LEFT JOIN bicycle ON bicycle.id = employee.bicycle_id WHERE bicycle_id IS NOT NULL;  - и так удобнее тк отобразятся только работники у кого есть велосипед.
+
+SELECT * FROM employee
+INNER JOIN bicycle ON bicycle.id = employee.bicycle_id WHERE bicycle_id IS NOT NULL;  - если использовать INNER JOIN, выборка не поменялась.
+
+SELECT * FROM employee
+INNER JOIN bicycle ON bicycle.id = employee.bicycle_id;  - LEFT JOIN с условием, это тоже самое что и INNER JOIN без условия, потому что INNER JOINS выводит только строки у которых 
+есть одинаковые колонки.
+
+Если цель увидеть кому не выдали велосипед, то LEFT JOIN(выводит все записи из левой таблицы и только совпадения из правой) с условием это оправдано.
+
+
+RIGHT JOIN
+RIGHT JOIN - это зеркальное отражэение того, как работает LEFT JOIN. Выведет все значения из правой таблицы и значения из левой таблицы даже если они отсутствуют.
+
+SELECT * FROM employee
+RIGHT JOIN bicycle ON bicycle.id = employee.bicycle_id;   - вывелась правая таблица со значениями как оснавная, а в левой таблице вывелось все чтобы в строках из правой.
+
+
+OUTER JOIN
+OUTER JOIN - соединит вообще все и у нас будут пустые поля как в правой так и в левой таблицах.
+
+SELECT * FROM employee
+FULL OUTER JOIN bicycle ON bicycle.id = employee.bicycle_id;  -  вывелось вообще все.
+
+
+
+
+
+13 - Экспортируем SQL таблицу в CSV - https://www.youtube.com/watch?v=DsHeniLrOGI&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=14
+Н/П: нам нужно пожать данные в бухгалтерию для сотрудников, которые получили велосипед.
+SELECT * FROM employee
+LEFT JOIN bicycle ON bicycle.id = employee.bicycle_id
+WHERE bicycle_id IS NOT NULL;		- тут employee JOINим с bicycle и подвязываемся через ON bicycle.id = employee.bicycle_id.
+\copy (SELECT * FROM employee LEFT JOIN bicycle ON bicycle.id = employee.bicycle_id WHERE bicycle_id IS NOT NULL) TO 'C:/PC/Work/Information/Other/DB/ExportDB' DELIMITER ',' CSV HEADER;  - экспорт БД с HEADER в csv.
+\copy (SELECT * FROM employee LEFT JOIN bicycle ON bicycle.id = employee.bicycle_id WHERE bicycle_id IS NOT NULL) TO 'C:/PC/Work/Information/Other/DB/ExportDB_without_header' DELIMITER ',' CSV;  - экспорт БД БЕЗ HEADER в csv.
+
+
+
+
+
+14 - Уникальные Идентификаторы UUID - https://www.youtube.com/watch?v=7OkBPxJXuIs&list=PLPPIc-4tm3YQsdhSV1qzAgDKTuMUNnPmp&index=15 
+Чтобы работать с уникальными идентификаторами (UUID) в postgrasSQL нужно установить расширение.
+SELECT * FROM pg_available_extensions;  - выводим список расширений, это то что нам нужно uuid-ossp.
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";  -  расширение устанавливаем
+SELECT * FROM pg_available_extensions;  - проверяем что расширение установлено, в столбце installed_version появится версия uuid-ossp которую мы установили.
+\df  - смотрим какие функции у нас есть в расширении.
+SELECT uuid_generate_v4();  - тут мы сгенерировали рандомный id "f05e48a1-245f-4b89-b9b4-9042bf0f94d3" вызвав функцию uuid_generate_v4(). 
+Далее мы можем подставлять эту функцию прямо в SQL запрос.
+Создаем табличку:
+CREATE TABLE pasport (
+	passport_serial UUID NOT NULL PRIMARY KEY,
+	issue_date DATE NOT NULL,
+	expire_date DATE NOT NULL,
+	country_of_issue VARCHAR(150) NOT NULL
+);
+Заполняем табличку:
+INSERT INTO pasport (passport_serial, issue_date, expire_date, country_of_issue)
+VALUES(uuid_generate_v4(), '2020-03-19', '2020-03-19', 'United_Kindom');
+
+SELECT * FROM pasport;  - и видим что вместо серийного номера у нас сгенерировался автоматически UUID.
